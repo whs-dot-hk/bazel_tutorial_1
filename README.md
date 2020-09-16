@@ -11,7 +11,7 @@ The ansible below install `kubectl` version `v1.19.1` into `/usr/local/bin/kubec
 ```
 
 ## Bazel
-We specified the `kubectl` version in `WORKSPACE`
+In bazel, we specified the `kubectl` version in `WORKSPACE`
 ```starlark
 WORKSPACE
 ---
