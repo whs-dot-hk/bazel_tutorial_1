@@ -30,3 +30,21 @@ container_image(
     name = "my_kubectl_image",
     base = ":kubectl_install_commit.tar",
 )
+
+genrule(
+    name = "kubectl_executable",
+    srcs = ["@kubectl_binary//file"],
+    outs = ["my_kubectl"],
+    cmd = "cp $(location @kubectl_binary//file) $@ && chmod a+x $@",
+)
+
+container_image(
+    name = "my_better_kubectl_image",
+    base = "@debian_image//image",
+    files = [
+        ":kubectl_executable",
+    ],
+    symlinks = {
+        "/usr/local/bin/kubectl": "/my_kubectl",
+    },
+)

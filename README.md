@@ -59,7 +59,40 @@ container_run_and_commit(
 )
 ```
 
-```starlark
+```sh
 $ bazel run //:my_kubectl_image
 $ docker run -it bazel:my_kubectl_image sh -c "kubectl version --client" 
+```
+
+## Building without docker
+Stop dockerd and try
+```sh
+$ bazel build //:my_better_kubectl_image
+```
+
+We make `kubectl` executable outside docker and "copy" it into the `files` attribute of `container_image` (could also be a new `container_layer` with the `layers` attribute, like above)
+```starlark
+genrule(
+    name = "kubectl_executable",
+    srcs = ["@kubectl_binary//file"],
+    outs = ["my_kubectl"],
+    cmd = "cp $(location @kubectl_binary//file) $@ && chmod a+x $@",
+)
+
+container_image(
+    name = "my_better_kubectl_image",
+    base = "@debian_image//image",
+    files = [
+        ":kubectl_executable",
+    ],
+    symlinks = {
+        "/usr/local/bin/kubectl": "/my_kubectl",
+    },
+)
+```
+
+Start dockerd again, to run the new image
+```sh
+$ bazel run //:my_better_kubectl_image
+$ docker run -it bazel:my_better_kubectl_image sh -c "kubectl version --client"
 ```
