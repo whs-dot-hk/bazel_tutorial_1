@@ -72,6 +72,10 @@ $ bazel build //:my_better_kubectl_image
 
 We make `kubectl` executable outside docker and "copy" it into the `files` attribute of `container_image` (could also be a new `container_layer` with the `layers` attribute, like above)
 ```starlark
+BUILD
+---
+...
+
 genrule(
     name = "kubectl_executable",
     srcs = ["@kubectl_binary//file"],
